@@ -10,9 +10,10 @@ output: html_document
 library(tidyverse)
 library(ggplot2)
 
-game1 <- read.csv("Cards_Against_Humanity_1_anonymised.csv", header = TRUE, sep = ";", na.strings = "")
+game1 <- read_csv2("Cards_Against_Humanity_1_anonymised.csv") %>% mutate(Game = "Game 1")
+game2 <- read_csv2("Cards_Against_Humanity_2_anonymised.csv") %>% mutate(Game = "Game 2")
 
-game1$Winner <- factor(game1$Winner)
+games <- rbind(game1, game2)
 ```
 
 # Descriptives
@@ -26,16 +27,17 @@ game1 %>% group_by(Judge, Winner) %>% summarise(points = n()) ##these are guesse
 
 # Plot
 ```{r plot}
-game1 %>% 
+games %>% 
   select(-Notes) %>% 
   drop_na() %>% 
   ggplot(aes(x = Round, y = Winner, col = Judge)) +
   geom_point(cex = 3) +
-  theme_bw() +
+  facet_wrap(~ Game, nrow = 2) +
+  theme_minimal() +
   labs(title = "Winner of each round")
 ```
 
 ```{r}
-ggsave("game1.png", height = 4)
+ggsave("winners.png")
 ```
 
