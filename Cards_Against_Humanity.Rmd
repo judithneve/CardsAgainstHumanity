@@ -1,0 +1,41 @@
+---
+title: "Cards Againt Humanity"
+author: "Judith"
+date: "13-04-2020"
+output: html_document
+---
+
+# Reading in data
+```{r setup}
+library(tidyverse)
+library(ggplot2)
+
+game1 <- read.csv("Cards_Against_Humanity_1_anonymised.csv", header = TRUE, sep = ";", na.strings = "")
+
+game1$Winner <- factor(game1$Winner)
+```
+
+# Descriptives
+```{r descriptives}
+#Number of wins per player
+game1 %>% group_by(Winner) %>% summarise(wins = n()) %>% arrange(desc(wins))
+
+#Number of wins given to another person
+game1 %>% group_by(Judge, Winner) %>% summarise(points = n()) ##these are guesses as we are not fully sure about the placement of the wins
+```
+
+# Plot
+```{r plot}
+game1 %>% 
+  select(-Notes) %>% 
+  drop_na() %>% 
+  ggplot(aes(x = Round, y = Winner, col = Judge)) +
+  geom_point(cex = 3) +
+  theme_bw() +
+  labs(title = "Winner of each round")
+```
+
+```{r}
+ggsave("game1.png", height = 4)
+```
+
